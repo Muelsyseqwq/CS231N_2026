@@ -95,7 +95,7 @@ class KNearestNeighbor(object):
             # points, and store the result in dists[i, :].                        #
             # Do not use np.linalg.norm().                                        #
             #######################################################################
-            dists[i:] = np.sqrt(np.sum((X[i] - self.X_train) ** 2,axis=1))
+            dists[i, :] = np.sqrt(np.sum((X[i] - self.X_train) ** 2,axis=1))
         return dists
 
     def compute_distances_no_loops(self, X):
