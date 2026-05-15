@@ -121,11 +121,11 @@ def softmax_loss(x, y):
     ###########################################################################
     # TODO: Copy over your solution from Assignment 1.                        #
     ###########################################################################
-    N = np.shape[0]
+    N = x.shape[0]
     rowmax = np.max(x,axis = 1,keepdims = True) # 求出最大值
     expx = np.exp(x - rowmax)
     p = expx / (np.sum(expx,axis = 1,keepdims = True))
-    loss = np.sum(np.log(p[np.arrange(N)],y))/N
+    loss = -np.sum(np.log(p[np.arange(N),y]))/N
     dx = p.copy()
     dx[np.arange(N),y] -= 1
     dx /= N
@@ -295,6 +295,12 @@ def batchnorm_backward_alt(dout, cache):
     # should be able to compute gradients with respect to the inputs in a     #
     # single statement; our implementation fits on a single 80-character line.#
     ###########################################################################
+    x,mu,var,gamma,eps = cache
+    dbeta = np.sum(dout,axis = 0)
+    dgamma = np.sum(dout * ((x - mu)/np.sqrt(var + eps)),axis = 0)
+    x_hat = (x - mu)/np.sqrt(var + eps)
+    dx = gamma *(dout - np.mean(dout,axis = 0) - x_hat*(np.mean(x_hat * dout,axis = 0)))/np.sqrt(var + eps)
+    N = dout.shape[0]
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
