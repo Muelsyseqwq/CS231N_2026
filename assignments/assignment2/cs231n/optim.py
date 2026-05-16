@@ -67,7 +67,7 @@ def sgd_momentum(w, dw, config=None):
     # TODO: Implement the momentum update formula. Store the updated value in #
     # the next_w variable. You should also use and update the velocity v.     #
     ###########################################################################
-    v = v - config['learning_rate'] * dw
+    v = config['momentum'] * v - config['learning_rate'] * dw
     next_w = w + v
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -105,7 +105,7 @@ def rmsprop(w, dw, config=None):
 
   
     config['cache'] = config['decay_rate'] * config['cache'] + (1 - config['decay_rate']) * dw * dw
-    next_w = w - config['learning_rate'] *dw / np.sqrt((config['cache'])+ config['epsilon'])
+    next_w = w - config['learning_rate'] *dw / (np.sqrt((config['cache']))+ config['epsilon'])
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -149,10 +149,10 @@ def adam(w, dw, config=None):
     config['m'] = config['beta1'] * config['m'] + (1 - config['beta1']) * dw
     config['v'] = config['beta2'] * config['v'] + (1 - config['beta2']) * dw * dw
     config['t'] += 1
-    m_t = config['m'] / (1 - np.power(config['m'],config['t']))
-    v_t = config['v'] / (1 - np.power(config['v'],config['t']))
+    m_t = config['m'] / (1 - np.power(config['beta1'],config['t']))
+    v_t = config['v'] / (1 - np.power(config['beta2'],config['t']))
 
-    next_w = w - config['learning_rate'] * (m_t/(np.sqrt(v_t+config['epsilon']))) 
+    next_w = w - config['learning_rate'] * (m_t/(np.sqrt(v_t)+config['epsilon'])) 
 
 
     ###########################################################################
