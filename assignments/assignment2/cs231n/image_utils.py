@@ -66,10 +66,13 @@ def image_from_url(url):
     """
     try:
         f = urllib.request.urlopen(url)
-        _, fname = tempfile.mkstemp()
+        fd, fname = tempfile.mkstemp(suffix=".jpg")
+        os.close(fd)
+
         with open(fname, "wb") as ff:
             ff.write(f.read())
-        img = imread(fname)
+        with Image.open(fname) as image:
+            img = np.asarray(image.convert("RGB"))
         os.remove(fname)
         return img
     except urllib.error.URLError as e:

@@ -1,0 +1,16 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Large datasets and archives
+*.zip
+*.tar.gz
+*.h5
+cs231n/datasets/coco_captioning/
+cs231n/datasets/*.zip
+cs231n/datasets/*.tar.gz
+cs231n/datasets/*.h5

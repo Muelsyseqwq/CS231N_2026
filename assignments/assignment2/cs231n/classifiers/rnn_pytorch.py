@@ -141,6 +141,15 @@ class CaptioningRNN:
         #                                                                          #
         # You also don't have to implement the backward pass.                      #
         ############################################################################
+        h0 = affine_forward(features, W_proj, b_proj)
+        out = word_embedding_forward(captions_in, W_embed)
+        if self.cell_type == 'rnn':
+            h = rnn_forward(out, h0, Wx, Wh, b)
+        else:
+            h = lstm_forward(out, h0, Wx, Wh, b)
+        scores = temporal_affine_forward(h, W_vocab, b_vocab)
+        loss = temporal_softmax_loss(scores, captions_out, mask, verbose=False)
+
 
         ############################################################################
         #                             END OF YOUR CODE                             #
@@ -173,7 +182,7 @@ class CaptioningRNN:
           of captions should be the first sampled word, not the <START> token.
         """
         N = features.shape[0]
-        captions = self._null * torch.ones((N, max_length), dtype=torch.long)
+        captions = self._null * torch.ones((N, max_length), dtype=torch.long, device=features.device)
 
         # Unpack parameters
         W_proj, b_proj = self.params["W_proj"], self.params["b_proj"]
@@ -205,7 +214,20 @@ class CaptioningRNN:
         # NOTE: we are still working over minibatches in this function. Also if   #
         # you are using an LSTM, initialize the first cell state to zeros.        #
         ###########################################################################
+        prev_h = affine_forward(features, W_proj, b_proj)
+        prev_word = self._start * torch.ones((N,), dtype=torch.long, device=features.device)
+        prev_c = torch.zeros_like(prev_h)
 
+        for t in range(max_length):
+            word_vec = word_embedding_forward(prev_word, W_embed)
+            if self.cell_type == 'rnn':
+                prev_h = rnn_step_forward(word_vec, prev_h, Wx, Wh, b)
+            else:
+                prev_h, prev_c = lstm_step_forward(word_vec, prev_h, prev_c, Wx, Wh, b)
+
+            scores = prev_h @ W_vocab + b_vocab
+            prev_word = torch.argmax(scores, dim=1)
+            captions[:, t] = prev_word
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
