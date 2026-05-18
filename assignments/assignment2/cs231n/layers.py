@@ -300,7 +300,7 @@ def batchnorm_backward_alt(dout, cache):
     dgamma = np.sum(dout * (x - mu)/(np.sqrt(var+eps)),axis = 0)
     x_hat = (x - mu)/np.sqrt(var + eps)
     dx = gamma *(dout - np.mean(dout,axis = 0) - x_hat*(np.mean(x_hat * dout,axis = 0)))/np.sqrt(var+eps)
-    N = dout.shape[0]
+    
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -443,7 +443,8 @@ def dropout_forward(x, dropout_param):
         # TODO: Implement training phase forward pass for inverted dropout.   #
         # Store the dropout mask in the mask variable.                        #
         #######################################################################
-        pass
+        mask = (np.random.rand(*x.shape) < p)/p
+        out =   x * mask
         #######################################################################
         #                           END OF YOUR CODE                          #
         #######################################################################
@@ -451,7 +452,7 @@ def dropout_forward(x, dropout_param):
         #######################################################################
         # TODO: Implement the test phase forward pass for inverted dropout.   #
         #######################################################################
-        pass
+        out = x
         #######################################################################
         #                            END OF YOUR CODE                         #
         #######################################################################
@@ -471,13 +472,13 @@ def dropout_backward(dout, cache):
     """
     dropout_param, mask = cache
     mode = dropout_param["mode"]
-
+    p = dropout_param['p']
     dx = None
     if mode == "train":
         #######################################################################
         # TODO: Implement training phase backward pass for inverted dropout   #
         #######################################################################
-        pass
+        dx =(dout * mask)
         #######################################################################
         #                          END OF YOUR CODE                           #
         #######################################################################
