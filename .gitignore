@@ -1,0 +1,24 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Datasets and large downloaded data
+assignments/assignment3/cs231n/datasets/coco_captioning/
+assignments/assignment3/data/
+
+# Local generated archives
+*.zip
+*.tar.gz
+*.tgz
+
+# Local experiment outputs / pretrained weights
+assignments/assignment3/cs231n/exp/
+assignments/assignment3/pretrained_model/
