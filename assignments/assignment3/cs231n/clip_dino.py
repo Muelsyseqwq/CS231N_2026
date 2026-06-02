@@ -7,6 +7,15 @@ from torchvision import transforms as T
 import cv2
 from tqdm.auto import tqdm
 
+import sys
+import types
+if "resource" not in sys.modules:
+    resource = types.ModuleType("resource")
+    resource.RLIMIT_NOFILE = 0
+    resource.getrlimit = lambda _: (2048, 2048)
+    resource.setrlimit = lambda *_: None
+    sys.modules["resource"] = resource
+
 
 def get_similarity_no_loop(text_features, image_features):
     """
@@ -271,7 +280,10 @@ class DINOSegmentation:
         # function to train classify each DINO feature vector into a seg. class.   #
         # It can be a linear layer or two layer neural network.                    #
         ############################################################################
-
+        self.device = device
+        self.model = nn.Linear(inp_dim,num_classes).to(device)
+        self.optimizer = torch.optim.Adam(self.model.parameters(),lr = 1e-3)
+        self.criterion = nn.CrossEntropyLoss()
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -288,7 +300,16 @@ class DINOSegmentation:
         ############################################################################
         # TODO: Train your model for `num_iters` steps.                            #
         ############################################################################
+        self.model.train()
+        X_train = X_train.to(self.device)
+        Y_train = Y_train.to(self.device)
+        for _ in range(num_iters):
+            logits = self.model(X_train)
+            loss = self.criterion(logits,Y_train)
 
+            self.optimizer.zero_grad()
+            loss.backward()
+            self.optimizer.step()
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -308,7 +329,10 @@ class DINOSegmentation:
         ############################################################################
         # TODO: Train your model for `num_iters` steps.                            #
         ############################################################################
-
+        self.model.eval()
+        X_test = X_test.to(self.device)
+        logits = self.model(X_test)
+        pred_classes = torch.argmax(logits,dim = 1)
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
